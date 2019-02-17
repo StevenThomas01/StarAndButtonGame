@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import _ from "lodash";
 
 const Stars = props => {
-  const numberOfStars = 1 + Math.floor(Math.random() * 9);
-
   //   let stars = [];
   //   for (let index = 0; index < numberOfStars; index++) {
   //     // Rule: Pushes value into array
@@ -13,7 +11,7 @@ const Stars = props => {
   // Rule: React auto deals with stars array
   return (
     <div className="col-5">
-      {_.range(numberOfStars).map(i => (
+      {_.range(props.numberOfStars).map(i => (
         //   key is not displayed in html. Required by React
         <li key={i} className="fa fa-star" />
       ))}
@@ -56,7 +54,13 @@ const Numbers = props => {
       <div>
         {/* Rule: => () is function call. => {} produces error!!! */}
         {Numbers.list.map((number, i) => (
-          <span key={i} className={numberClassName(number)}>
+          <span
+            onClick={() => {
+              props.SelectNumber(number);
+            }}
+            key={i}
+            className={numberClassName(number)}
+          >
             {number}
           </span>
         ))}
@@ -69,7 +73,16 @@ Numbers.list = _.range(1, 10);
 
 class Game extends Component {
   state = {
-    selectedNumbers: [2, 4]
+    selectedNumbers: [2, 4],
+    numberOfStars: 1 + Math.floor(Math.random() * 9)
+  };
+
+  SelectNumber = clickedNumber => {
+    if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) return;
+
+    this.setState(prevState => ({
+      selectedNumbers: prevState.selectedNumbers.concat(clickedNumber)
+    }));
   };
 
   render() {
@@ -78,12 +91,15 @@ class Game extends Component {
         <h3>Play Nine</h3>
         <hr />
         <div className="row">
-          <Stars />
+          <Stars numberOfStars={this.state.numberOfStars} />
           <Button />
           <Answer selectedNumbers={this.state.selectedNumbers} />
         </div>
         <br />
-        <Numbers selectedNumbers={this.state.selectedNumbers} />
+        <Numbers
+          SelectNumber={this.SelectNumber}
+          selectedNumbers={this.state.selectedNumbers}
+        />
       </div>
     );
   }

@@ -32,6 +32,7 @@ span {
   background-color: #eee;
   color: #ddd;
   cursor: not-allowed;
+  /* pointer-events: none; */
 }
 
 .used {
