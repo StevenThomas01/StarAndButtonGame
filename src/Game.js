@@ -97,11 +97,12 @@ const Numbers = props => {
   );
 };
 
+// Rule: Numbers is a function/object. Numbers.list dynamically create "list" property to store value.
 Numbers.list = _.range(1, 10);
 
 class Game extends Component {
   state = {
-    selectedNumbers: [2, 4],
+    selectedNumbers: [],
     numberOfStars: 1 + Math.floor(Math.random() * 9),
     answerIsCorrect: null
   };
@@ -110,6 +111,7 @@ class Game extends Component {
     if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) return;
 
     this.setState(prevState => ({
+      answerIsCorrect: null, // Rule: we're inside state object
       selectedNumbers: prevState.selectedNumbers.concat(clickedNumber)
     }));
   };
@@ -117,6 +119,7 @@ class Game extends Component {
   RemoveNumber = clickedNumber => {
     // Rule: to change state have to still use the { selectedNumbers: ...} object
     this.setState(prevState => ({
+      answerIsCorrect: null,
       selectedNumbers: prevState.selectedNumbers.filter(
         number => number !== clickedNumber
       )
