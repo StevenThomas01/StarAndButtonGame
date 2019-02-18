@@ -25,7 +25,10 @@ const Button = props => {
   switch (props.answerIsCorrect) {
     case true:
       button = (
-        <button className="btn btn-success">
+        <button
+          className="btn btn-success"
+          onClick={() => props.acceptAnswer()}
+        >
           <i className="fa fa-check" />
         </button>
       );
@@ -66,11 +69,13 @@ const Answer = props => {
 };
 
 const Numbers = props => {
-  // Rule: if have const in function/obj then can create Number.list,
-  // where list (or any name you want) is a property
-  //const arrayOfNumbers = _.range(1, 10);
-
+  // Rule: numberClassName is function/object is called when rendering 1 to 9 numbers.
+  // Style is driven by usedNumbers and selectedNumbers state.
   const numberClassName = number => {
+    if (props.usedNumbers.indexOf(number) >= 0) {
+      return "used";
+    }
+
     //   Rule: search within array
     if (props.selectedNumbers.indexOf(number) >= 0) {
       return "selected";
@@ -104,7 +109,8 @@ class Game extends Component {
   state = {
     selectedNumbers: [],
     numberOfStars: 1 + Math.floor(Math.random() * 9),
-    answerIsCorrect: null
+    answerIsCorrect: null,
+    usedNumbers: []
   };
 
   SelectNumber = clickedNumber => {
@@ -142,6 +148,19 @@ class Game extends Component {
     }
   };
 
+  acceptAnswer = () => {
+    this.setState(prevState => ({
+      usedNumbers: prevState.usedNumbers.concat(prevState.selectedNumbers),
+
+      // Rule: reseting states, and when page re-submitted, have new number of stars, and
+      // restart of 1 to 9 numbers, but used numbers remain green/selected.
+
+      selectedNumbers: [],
+      numberOfStars: 1 + Math.floor(Math.random() * 9),
+      answerIsCorrect: null
+    }));
+  };
+
   render() {
     return (
       <div className="container">
@@ -153,6 +172,7 @@ class Game extends Component {
             selectedNumbers={this.state.selectedNumbers}
             checkAnswer={this.checkAnswer}
             answerIsCorrect={this.state.answerIsCorrect}
+            acceptAnswer={this.acceptAnswer}
           />
           <Answer
             RemoveNumber={this.RemoveNumber}
@@ -164,6 +184,7 @@ class Game extends Component {
           // Rule: this.SelectNumber is a function
           SelectNumber={this.SelectNumber}
           selectedNumbers={this.state.selectedNumbers}
+          usedNumbers={this.state.usedNumbers}
         />
       </div>
     );
