@@ -22,7 +22,10 @@ const Stars = props => {
 const Button = props => {
   return (
     <div className="col-2">
-      <button>=</button>
+      {/* // Rule: React determines display disabled text in html */}
+      <button className="btn" disabled={props.selectedNumbers.length === 0}>
+        =
+      </button>
     </div>
   );
 };
@@ -97,22 +100,27 @@ class Game extends Component {
   };
 
   render() {
+    // Rule: transfer state to separate constants.
+    const { selectedNumbers, numberOfStars } = this.state;
+
     return (
       <div className="container">
         <h3>Play Nine</h3>
         <hr />
         <div className="row">
-          <Stars numberOfStars={this.state.numberOfStars} />
-          <Button />
+          <Stars numberOfStars={numberOfStars} />
+          <Button selectedNumbers={selectedNumbers} />
           <Answer
             RemoveNumber={this.RemoveNumber}
-            selectedNumbers={this.state.selectedNumbers}
+            selectedNumbers={selectedNumbers}
           />
         </div>
         <br />
         <Numbers
+          // Rule: this.SelectNumber is a function
           SelectNumber={this.SelectNumber}
-          selectedNumbers={this.state.selectedNumbers}
+          // Rule: selectedNumbers is a const from this.state.selectedNumbers
+          selectedNumbers={selectedNumbers}
         />
       </div>
     );
