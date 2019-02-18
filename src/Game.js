@@ -20,14 +20,37 @@ const Stars = props => {
 };
 
 const Button = props => {
-  return (
-    <div className="col-2">
-      {/* // Rule: React determines display disabled text in html */}
-      <button className="btn" disabled={props.selectedNumbers.length === 0}>
-        =
-      </button>
-    </div>
-  );
+  let button;
+
+  switch (props.answerIsCorrect) {
+    case true:
+      button = (
+        <button className="btn btn-success">
+          <i className="fa fa-check" />
+        </button>
+      );
+      break;
+    case false:
+      button = (
+        <button className="btn btn-danger">
+          <i className="fa fa-times" />
+        </button>
+      );
+      break;
+    default:
+      button = (
+        <button
+          onClick={() => props.checkAnswer()}
+          className="btn"
+          disabled={props.selectedNumbers.length === 0}
+        >
+          =
+        </button>
+      );
+      break;
+  }
+
+  return <div className="col-2">{button}</div>;
 };
 
 const Answer = props => {
@@ -79,7 +102,8 @@ Numbers.list = _.range(1, 10);
 class Game extends Component {
   state = {
     selectedNumbers: [2, 4],
-    numberOfStars: 1 + Math.floor(Math.random() * 9)
+    numberOfStars: 1 + Math.floor(Math.random() * 9),
+    answerIsCorrect: null
   };
 
   SelectNumber = clickedNumber => {
@@ -99,28 +123,44 @@ class Game extends Component {
     }));
   };
 
-  render() {
-    // Rule: transfer state to separate constants.
-    const { selectedNumbers, numberOfStars } = this.state;
+  checkAnswer = () => {
+    let sumSelectedNumbers = 0;
+    // Rule: reduce, map and filter are inbuilt functions
+    sumSelectedNumbers = this.state.selectedNumbers.reduce(
+      (total, number) => total + number
+    );
 
+    if (this.state.numberOfStars === sumSelectedNumbers) {
+      this.setState(() => ({ answerIsCorrect: true }));
+      // console.log("true");
+    } else {
+      this.setState(() => ({ answerIsCorrect: false }));
+      // console.log("false");
+    }
+  };
+
+  render() {
     return (
       <div className="container">
         <h3>Play Nine</h3>
         <hr />
         <div className="row">
-          <Stars numberOfStars={numberOfStars} />
-          <Button selectedNumbers={selectedNumbers} />
+          <Stars numberOfStars={this.state.numberOfStars} />
+          <Button
+            selectedNumbers={this.state.selectedNumbers}
+            checkAnswer={this.checkAnswer}
+            answerIsCorrect={this.state.answerIsCorrect}
+          />
           <Answer
             RemoveNumber={this.RemoveNumber}
-            selectedNumbers={selectedNumbers}
+            selectedNumbers={this.state.selectedNumbers}
           />
         </div>
         <br />
         <Numbers
           // Rule: this.SelectNumber is a function
           SelectNumber={this.SelectNumber}
-          // Rule: selectedNumbers is a const from this.state.selectedNumbers
-          selectedNumbers={selectedNumbers}
+          selectedNumbers={this.state.selectedNumbers}
         />
       </div>
     );
