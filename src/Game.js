@@ -1,13 +1,8 @@
 import React, { Component } from "react";
 import _ from "lodash";
 
+// Rule: Stars is called a component
 const Stars = props => {
-  //   let stars = [];
-  //   for (let index = 0; index < numberOfStars; index++) {
-  //     // Rule: Pushes value into array
-  //     stars.push(<li key={index} className="fa fa-star" />);
-  //   }
-
   // Rule: React auto deals with stars array
   return (
     <div className="col-5">
@@ -19,6 +14,7 @@ const Stars = props => {
   );
 };
 
+// Rule: Stars is called a component
 const Button = props => {
   let button;
 
@@ -74,6 +70,7 @@ const Button = props => {
 const Answer = props => {
   return (
     <div className="col-5">
+      {/* // Rule: map() is like a foreach, but better. */}
       {props.selectedNumbers.map((number, i) => (
         <span onClick={() => props.RemoveNumber(number)} key={i}>
           {number}
@@ -85,7 +82,7 @@ const Answer = props => {
 
 const Numbers = props => {
   // Rule: numberClassName is function/object is called when rendering 1 to 9 numbers.
-  // Style is driven by usedNumbers and selectedNumbers state.
+  // Style is driven by usedNumbers state.
   const numberClassName = number => {
     if (props.usedNumbers.indexOf(number) >= 0) {
       return "used";
@@ -101,12 +98,14 @@ const Numbers = props => {
     <div className="card text-centre">
       <div>
         {/* Rule: => () is function call. => {} produces error!!! */}
+        {/* Expected an assignment or function call and instead saw an expression */}
         {Numbers.list.map((number, i) => (
           <span
             onClick={() => {
               props.SelectNumber(number);
             }}
             key={i}
+            // using a function to control style
             className={numberClassName(number)}
           >
             {number}
@@ -119,6 +118,7 @@ const Numbers = props => {
 
 const DoneFrame = props => {
   return (
+    // Rule: Can only have one parent div
     <div className="text-center">
       <h2>{props.doneStatus}</h2>
       <button onClick={props.PlayAgain}>Play Again</button>
@@ -134,6 +134,7 @@ class Game extends Component {
   // Why can't be used as a static value?
   static randomNumber = () => 1 + Math.floor(Math.random() * 9);
 
+  // Rule: Function just to return object relating to state only
   InitialiseState = () => ({
     selectedNumbers: [],
     numberOfStars: Game.randomNumber(),
@@ -177,10 +178,8 @@ class Game extends Component {
 
     if (this.state.numberOfStars === sumSelectedNumbers) {
       this.setState(() => ({ answerIsCorrect: true }));
-      // console.log("true");
     } else {
       this.setState(() => ({ answerIsCorrect: false }));
-      // console.log("false");
     }
   };
 
