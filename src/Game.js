@@ -115,13 +115,23 @@ const Numbers = props => {
   );
 };
 
+const DoneFrame = props => {
+  return (
+    <div className="text-center">
+      <h2>Game Over!</h2>
+    </div>
+  );
+};
+
 // Rule: Numbers is a function/object. Numbers.list dynamically create "list" property to store value.
 Numbers.list = _.range(1, 10);
 
 class Game extends Component {
+  static randomNumber = 1 + Math.floor(Math.random() * 9);
+
   state = {
     selectedNumbers: [],
-    numberOfStars: 1 + Math.floor(Math.random() * 9),
+    numberOfStars: randomNumber,
     answerIsCorrect: null,
     usedNumbers: [],
     refreshAttempt: 5
@@ -170,7 +180,7 @@ class Game extends Component {
       // restart of 1 to 9 numbers, but used numbers remain green/selected.
 
       selectedNumbers: [],
-      numberOfStars: 1 + Math.floor(Math.random() * 9),
+      numberOfStars: randomNumber,
       answerIsCorrect: null
     }));
   };
@@ -180,7 +190,7 @@ class Game extends Component {
 
     this.setState(prevState => ({
       selectedNumbers: [],
-      numberOfStars: 1 + Math.floor(Math.random() * 9),
+      numberOfStars: randomNumber,
       answerIsCorrect: null,
       refreshAttempt: prevState.refreshAttempt - 1
     }));
@@ -207,12 +217,16 @@ class Game extends Component {
           />
         </div>
         <br />
-        <Numbers
-          // Rule: this.SelectNumber is a function
-          SelectNumber={this.SelectNumber}
-          selectedNumbers={this.state.selectedNumbers}
-          usedNumbers={this.state.usedNumbers}
-        />
+        {this.state.refreshAttempt === 0 ? (
+          <DoneFrame />
+        ) : (
+          <Numbers
+            // Rule: this.SelectNumber is a function
+            SelectNumber={this.SelectNumber}
+            selectedNumbers={this.state.selectedNumbers}
+            usedNumbers={this.state.usedNumbers}
+          />
+        )}
       </div>
     );
   }
