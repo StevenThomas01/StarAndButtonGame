@@ -58,8 +58,12 @@ const Button = props => {
       {button}
       <br />
       <br />
-      <button className="btn btn-warning btn-sm" onClick={props.redraw}>
-        <i className="fa fa-refresh" />
+      <button
+        className="btn btn-warning btn-sm"
+        onClick={props.redraw}
+        disabled={props.redraw === 0}
+      >
+        <i className="fa fa-refresh">refresh: {props.refreshAttempt}</i>
       </button>
     </div>
   );
@@ -119,7 +123,8 @@ class Game extends Component {
     selectedNumbers: [],
     numberOfStars: 1 + Math.floor(Math.random() * 9),
     answerIsCorrect: null,
-    usedNumbers: []
+    usedNumbers: [],
+    refreshAttempt: 5
   };
 
   SelectNumber = clickedNumber => {
@@ -171,10 +176,13 @@ class Game extends Component {
   };
 
   redraw = () => {
-    this.setState(() => ({
+    if (this.state.refreshAttempt <= 0) return;
+
+    this.setState(prevState => ({
       selectedNumbers: [],
       numberOfStars: 1 + Math.floor(Math.random() * 9),
-      answerIsCorrect: null
+      answerIsCorrect: null,
+      refreshAttempt: prevState.refreshAttempt - 1
     }));
   };
 
@@ -191,6 +199,7 @@ class Game extends Component {
             answerIsCorrect={this.state.answerIsCorrect}
             acceptAnswer={this.acceptAnswer}
             redraw={this.redraw}
+            refreshAttempt={this.state.refreshAttempt}
           />
           <Answer
             RemoveNumber={this.RemoveNumber}
