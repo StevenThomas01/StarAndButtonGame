@@ -61,9 +61,11 @@ const Button = props => {
       <button
         className="btn btn-warning btn-sm"
         onClick={props.redraw}
-        disabled={props.redraw === 0}
+        disabled={props.refreshAttempt === -1}
       >
-        <i className="fa fa-refresh">refresh: {props.refreshAttempt}</i>
+        <i className="fa fa-refresh">
+          refresh: {props.refreshAttempt === -1 ? 0 : props.refreshAttempt}
+        </i>
       </button>
     </div>
   );
@@ -118,7 +120,7 @@ const Numbers = props => {
 const DoneFrame = props => {
   return (
     <div className="text-center">
-      <h2>Game Over!</h2>
+      <h2>{props.doneStatus}</h2>
     </div>
   );
 };
@@ -127,14 +129,17 @@ const DoneFrame = props => {
 Numbers.list = _.range(1, 10);
 
 class Game extends Component {
-  static randomNumber = 1 + Math.floor(Math.random() * 9);
+  // Rule: Must be called as a function to work.
+  // Why can't be used as a static value?
+  static randomNumber = () => 1 + Math.floor(Math.random() * 9);
 
   state = {
     selectedNumbers: [],
-    numberOfStars: randomNumber,
+    numberOfStars: Game.randomNumber(),
     answerIsCorrect: null,
     usedNumbers: [],
-    refreshAttempt: 5
+    refreshAttempt: 5,
+    doneStatus: null
   };
 
   SelectNumber = clickedNumber => {
@@ -173,27 +178,47 @@ class Game extends Component {
   };
 
   acceptAnswer = () => {
-    this.setState(prevState => ({
-      usedNumbers: prevState.usedNumbers.concat(prevState.selectedNumbers),
+    this.setState(
+      prevState => ({
+        usedNumbers: prevState.usedNumbers.concat(prevState.selectedNumbers),
 
-      // Rule: reseting states, and when page re-submitted, have new number of stars, and
-      // restart of 1 to 9 numbers, but used numbers remain green/selected.
+        // Rule: reseting states, and when page re-submitted, have new number of stars, and
+        // restart of 1 to 9 numbers, but used numbers remain green/selected.
 
-      selectedNumbers: [],
-      numberOfStars: randomNumber,
-      answerIsCorrect: null
-    }));
+        selectedNumbers: [],
+        numberOfStars: Game.randomNumber(),
+        answerIsCorrect: null
+      }),
+      // Rule: Second parameter is a callback function pointer
+      this.updateDoneStatus
+    );
   };
 
   redraw = () => {
-    if (this.state.refreshAttempt <= 0) return;
+    if (this.state.refreshAttempt <= -1) return;
 
-    this.setState(prevState => ({
-      selectedNumbers: [],
-      numberOfStars: randomNumber,
-      answerIsCorrect: null,
-      refreshAttempt: prevState.refreshAttempt - 1
-    }));
+    this.setState(
+      prevState => ({
+        selectedNumbers: [],
+        numberOfStars: Game.randomNumber(),
+        answerIsCorrect: null,
+        refreshAttempt: prevState.refreshAttempt - 1
+      }),
+      this.updateDoneStatus
+    );
+  };
+
+  updateDoneStatus = () => {
+    this.setState(prevState => {
+      if (prevState.usedNumbers.length === 9) {
+        return { doneStatus: "You Win." };
+      }
+
+      // Qs. Why previous state same as current state?
+      if (prevState.refreshAttempt === -1) {
+        return { doneStatus: "Game Over!" };
+      }
+    });
   };
 
   render() {
@@ -217,8 +242,8 @@ class Game extends Component {
           />
         </div>
         <br />
-        {this.state.refreshAttempt === 0 ? (
-          <DoneFrame />
+        {this.state.doneStatus !== null ? (
+          <DoneFrame doneStatus={this.state.doneStatus} />
         ) : (
           <Numbers
             // Rule: this.SelectNumber is a function
