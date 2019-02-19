@@ -121,6 +121,7 @@ const DoneFrame = props => {
   return (
     <div className="text-center">
       <h2>{props.doneStatus}</h2>
+      <button onClick={props.PlayAgain}>Play Again</button>
     </div>
   );
 };
@@ -133,13 +134,19 @@ class Game extends Component {
   // Why can't be used as a static value?
   static randomNumber = () => 1 + Math.floor(Math.random() * 9);
 
-  state = {
+  InitialiseState = () => ({
     selectedNumbers: [],
     numberOfStars: Game.randomNumber(),
     answerIsCorrect: null,
     usedNumbers: [],
     refreshAttempt: 5,
     doneStatus: null
+  });
+
+  state = this.InitialiseState();
+
+  PlayAgain = () => {
+    this.setState(this.InitialiseState());
   };
 
   SelectNumber = clickedNumber => {
@@ -243,7 +250,10 @@ class Game extends Component {
         </div>
         <br />
         {this.state.doneStatus !== null ? (
-          <DoneFrame doneStatus={this.state.doneStatus} />
+          <DoneFrame
+            PlayAgain={this.PlayAgain}
+            doneStatus={this.state.doneStatus}
+          />
         ) : (
           <Numbers
             // Rule: this.SelectNumber is a function
